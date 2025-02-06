@@ -1,0 +1,101 @@
+package com.transaction.book.controller;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.transaction.book.dto.requestDTO.CustomerRequestDto;
+import com.transaction.book.dto.responseObjects.DataResponse;
+import com.transaction.book.dto.responseObjects.SuccessResponse;
+import com.transaction.book.entities.Address;
+import com.transaction.book.entities.Customer;
+import com.transaction.book.services.serviceImpl.AddressServiceImpl;
+import com.transaction.book.services.serviceImpl.CustomerServiceImpl;
+
+@RestController
+@RequestMapping("/api/user")
+@CrossOrigin
+public class CustomerController {
+    
+    @Autowired
+    private CustomerServiceImpl customerServiceImpl;
+
+    @Autowired
+    private AddressServiceImpl addressServiceImpl;
+
+    @PostMapping("/addCustomer")
+    public ResponseEntity<SuccessResponse> addCustomer(@RequestBody CustomerRequestDto request){
+        SuccessResponse response  = new SuccessResponse();
+        Customer customer = new Customer();
+        Address address = new Address();
+        try{
+            customer.setName(request.getName());
+            customer.setMobileNo(request.getMobileNo());
+            customer.setGstinNo(request.getGstinNo());
+            customer.setUpdateDate("");
+            customer = this.customerServiceImpl.addCustomer(customer);
+
+            address.setBuildingNO(request.getAddress().getBuildingNO());
+            address.setArea(request.getAddress().getArea());
+            address.setCity(request.getAddress().getCity());
+            address.setPincode(request.getAddress().getPincode());
+            address.setState(request.getAddress().getState());
+            address.setCustomer(customer);
+            this.addressServiceImpl.addAddress(address);
+           
+            response.setMessage("customer added successfully !");
+            response.setHttpStatus(HttpStatus.OK);
+            response.setStatusCode(200);
+            return ResponseEntity.of(Optional.of(response));
+        }catch(Exception e){
+            response.setMessage(e.getMessage());
+            response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode(500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/getAllCustomers")
+    public ResponseEntity<DataResponse> getAllCustomer(){
+        DataResponse response = new DataResponse();
+        try{
+            response.setData(this.customerServiceImpl.getAllCustomers());
+            response.setMessage("get all Customers !");
+            response.setHttpStatus(HttpStatus.OK);
+            response.setStatusCode(200);
+            return ResponseEntity.of(Optional.of(response));
+        }catch(Exception e){
+            response.setMessage(e.getMessage());
+            response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode(500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @DeleteMapping("/deleteCustomer/{id}")
+    public ResponseEntity<SuccessResponse> deleteCustomer(@PathVariable("id")long id){
+        SuccessResponse response = new SuccessResponse();
+        try{
+            this.customerServiceImpl.deleteCusotmer(id);
+            response.setMessage("delete Customer successfully !");
+            response.setHttpStatus(HttpStatus.OK);
+            response.setStatusCode(200);
+            return ResponseEntity.of(Optional.of(response));
+        }catch(Exception e){
+            response.setMessage(e.getMessage());
+            response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode(500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+}

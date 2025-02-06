@@ -1,0 +1,54 @@
+package com.transaction.book.services.serviceImpl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.transaction.book.entities.Customer;
+import com.transaction.book.repository.CustomerRepo;
+import com.transaction.book.services.serviceInterface.CustomerService;
+
+@Service
+public class CustomerServiceImpl implements CustomerService {
+
+    @Autowired
+    private CustomerRepo customerRepo;
+
+    @Override
+    public Customer addCustomer(Customer customer) {
+        return this.customerRepo.save(customer);
+    }
+
+    @Override
+    public Customer getCustomerByMobileNo(String mobileNO) {
+        return this.customerRepo.findByMobileNo(mobileNO);
+    }
+
+    @Override
+    public Customer getCustomerById(long id) {
+        return this.customerRepo.findById(id).get();
+    }
+
+    @Override
+    public List<Customer> getAllCustomers() {
+        return this.customerRepo.findAll();
+    }
+
+    @Override
+    public void deleteCusotmer(long id) {
+        this.customerRepo.deleteById(id);
+        return;
+    }
+
+    @Override
+    public double getTotalGetAmount() {
+        return this.customerRepo.getTotalGetAmount();
+    }
+
+    @Override
+    public double getToalGaveAmount() {
+        return this.customerRepo.getTotalGaveAmount();
+    }
+
+}
