@@ -40,7 +40,7 @@ public class AuthController {
     @PostMapping("/registerUser")
     public ResponseEntity<SuccessResponse> registerUser(@RequestBody RegistrationRequest request){
         SuccessResponse response = new SuccessResponse();
-        User user = this.userServiceImpl.getUserByMobileNo(request.getMobileNo());
+        User user = this.userServiceImpl.getUserByEmail(request.getEmail());
         if(user!=null){
             response.setMessage("User Already Present successfully !");
             response.setHttpStatus(HttpStatus.ALREADY_REPORTED);
@@ -83,7 +83,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest request){
         SuccessResponse response= new SuccessResponse();
-        User user = this.userServiceImpl.getUserByMobileNo(request.getMobileNo());
+        User user = this.userServiceImpl.getUserByEmail(request.getEmail());
         if(user==null){
             response.setMessage("User not present ! wrong mobile No");
             response.setHttpStatus(HttpStatus.UNAUTHORIZED);
@@ -96,7 +96,7 @@ public class AuthController {
             response.setStatusCode(500);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-        UserDetails userDetails = this.customUserDetail.loadUserByUsername(request.getMobileNo());
+        UserDetails userDetails = this.customUserDetail.loadUserByUsername(request.getEmail());
         boolean isPasswordValid = new BCryptPasswordEncoder().matches(request.getPassword(), userDetails.getPassword());
         if(!isPasswordValid){
             response.setMessage("Invalid Password !");
@@ -104,7 +104,7 @@ public class AuthController {
             response.setStatusCode(500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        Authentication authentication = authenticate(user.getMobileNo(), request.getPassword());
+        Authentication authentication = authenticate(user.getEmail(), request.getPassword());
         String role = user.getRole().toString();
         String token = JwtProvider.generateJwt(authentication);
 
@@ -125,8 +125,8 @@ public class AuthController {
     }
 
 
-    private Authentication authenticate(String mobileNo,String password){
-        UserDetails userDetails = this.customUserDetail.loadUserByUsername(mobileNo);
+    private Authentication authenticate(String email,String password){
+        UserDetails userDetails = this.customUserDetail.loadUserByUsername(email);
         if(userDetails==null){
             throw new UsernameNotFoundException("bad credentials");
         }

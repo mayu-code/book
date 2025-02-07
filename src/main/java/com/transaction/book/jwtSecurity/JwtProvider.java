@@ -17,14 +17,14 @@ public class JwtProvider {
         String jwt = Jwts.builder()
                     .setIssuer("ok").setIssuedAt(new Date())
                     .setExpiration(new Date(new Date().getTime()+84600000))
-                    .claim("mobileNo", authentication.getName())
+                    .claim("email", authentication.getName())
                     .claim("role", authentication.getAuthorities().toArray()[0].toString())
                     .signWith(key)
                     .compact();
         return jwt;         
     }
 
-    public static String getMobileNoByJwt(String jwt){
+    public static String getEmailNoByJwt(String jwt){
         if (jwt.startsWith("Bearer ")) {
             jwt = jwt.substring(7);
         }
@@ -32,7 +32,7 @@ public class JwtProvider {
                         .setSigningKey(key).build()
                         .parseClaimsJws(jwt).getBody();
 
-        String mobileNo = String.valueOf(claims.get("mobileNo"));
+        String mobileNo = String.valueOf(claims.get("email"));
         return mobileNo;
     }
 

@@ -83,8 +83,30 @@ public class TransactionController {
     @PostMapping("/updateTransaction")
     public ResponseEntity<SuccessResponse> updateTransaction(@RequestBody UpdateTransaction request){
         SuccessResponse response = new SuccessResponse();
+        Transaction transaction = this.transactionServiceImpl.getTransactionById(request.getId());
+        Customer customer = transaction.getCustomer();
+        if((request.isGave()&&request.isGot())||(!request.isGave()&&!request.isGot())){
+            response.setMessage("please set amount is gave or got ! you can set only one at a time");
+            response.setHttpStatus(HttpStatus.NOT_FOUND);
+            response.setStatusCode(200);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
         try{
+            customer.setAmount(customer.getAmount()-transaction.getAmount());
+            transaction.setDate(request.getDate());
+            transaction.setDetail(request.getDetail());
 
+            if(request.isGave()){
+                customer.setAmount(customer.getAmount()+(request.getAmount()*(-1)));
+                transaction.setAmount(request.getAmount()*(-1));
+            }
+            else{
+                customer.setAmount(customer.getAmount()+request.getAmount());
+                transaction.setAmount(request.getAmount());
+            }
+            transaction.setBalanceAmount(customer.getAmount());
+            this.customerServiceImpl.addCustomer(customer);
+            this.transactionServiceImpl.addTransaction(transaction);
             response.setMessage("transaction update successfully !");
             response.setHttpStatus(HttpStatus.OK);
             response.setStatusCode(200);

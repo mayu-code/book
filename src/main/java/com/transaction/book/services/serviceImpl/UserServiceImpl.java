@@ -38,8 +38,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserByJwt(String jwt) {
-        String mobileNo =JwtProvider.getMobileNoByJwt(jwt);
-        return this.userRepo.findByMobileNo(mobileNo);
+        String email =JwtProvider.getEmailNoByJwt(jwt);
+        return this.userRepo.findByEmail(email);
     }
 
     @Override

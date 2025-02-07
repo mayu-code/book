@@ -25,7 +25,7 @@ public class JwtValidator extends OncePerRequestFilter {
 
         if (jwt != null) {
             try {
-                String mobileNo = JwtProvider.getMobileNoByJwt(jwt);
+                String mobileNo = JwtProvider.getEmailNoByJwt(jwt);
                 String role = JwtProvider.getRoleByJwt(jwt);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(mobileNo, null,
                         List.of(new SimpleGrantedAuthority(role)));

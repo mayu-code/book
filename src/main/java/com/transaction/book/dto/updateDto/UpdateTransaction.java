@@ -5,8 +5,9 @@ import lombok.Data;
 @Data
 public class UpdateTransaction {
     private long id;
-    private double gaveAmount;
-    private double gotAmount;
+    private double amount;
     private String date;
     private String detail;
+    private boolean gave;
+    private boolean got;
 }
