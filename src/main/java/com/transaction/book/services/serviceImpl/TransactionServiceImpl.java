@@ -40,4 +40,9 @@ public class TransactionServiceImpl implements TransactionService{
     public List<Transaction> getAfterTransactions(long customerId, String date) {
         return this.transactionRepo.findAfterTransactions(customerId, date);   
     }
+
+    @Override
+    public Transaction findPreviousTransaction(long id, String date) {
+        return this.transactionRepo.findPreviousTransaction(id, date);
+    }
 }

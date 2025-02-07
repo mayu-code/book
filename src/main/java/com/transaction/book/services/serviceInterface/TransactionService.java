@@ -13,4 +13,6 @@ public interface TransactionService {
 
     List<Transaction> getAfterTransactions(long id,String date);
 
+    Transaction findPreviousTransaction(long id,String date);
+
 }

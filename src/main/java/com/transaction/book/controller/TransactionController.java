@@ -67,16 +67,23 @@ public class TransactionController {
                 transaction.setAmount(request.getAmount());
             }
 
-            for(Transaction transaction2:this.transactionServiceImpl.getAfterTransactions(customer.getId(), request.getDate())){
-                transaction2.setBalanceAmount(transaction2.getBalanceAmount()+request.getAmount());
-                this.transactionServiceImpl.addTransaction(transaction);
+            Transaction transaction3 = this.transactionServiceImpl.findPreviousTransaction(customer.getId(), request.getDate());
+            if(transaction3==null){
+                transaction.setBalanceAmount(transaction.getAmount());
+            }else{
+                transaction.setBalanceAmount(transaction3.getBalanceAmount()+transaction.getAmount());
             }
 
             customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
-            transaction.setBalanceAmount(customer.getAmount());
             transaction.setCustomer(customer);
             customer= this.customerServiceImpl.addCustomer(customer);
-            this.transactionServiceImpl.addTransaction(transaction);
+            transaction = this.transactionServiceImpl.addTransaction(transaction);
+            double balance = transaction.getBalanceAmount()+request.getAmount();
+            for(Transaction transaction2:this.transactionServiceImpl.getAfterTransactions(customer.getId(), request.getDate())){
+                transaction2.setBalanceAmount(balance);
+                transaction2= this.transactionServiceImpl.addTransaction(transaction2);
+                balance = transaction2.getBalanceAmount();
+            }
 
             response.setMessage("Add Transaction Successfully !");
             response.setHttpStatus(HttpStatus.OK);
