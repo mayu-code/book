@@ -24,7 +24,7 @@ public class JwtProvider {
         return jwt;         
     }
 
-    public static String getEmailNoByJwt(String jwt){
+    public static String getEmailByJwt(String jwt){
         if (jwt.startsWith("Bearer ")) {
             jwt = jwt.substring(7);
         }

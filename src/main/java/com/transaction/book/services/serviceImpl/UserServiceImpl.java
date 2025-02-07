@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserByJwt(String jwt) {
-        String email =JwtProvider.getEmailNoByJwt(jwt);
+        String email =JwtProvider.getEmailByJwt(jwt);
         return this.userRepo.findByEmail(email);
     }
 

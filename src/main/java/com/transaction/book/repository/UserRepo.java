@@ -15,4 +15,6 @@ public interface UserRepo extends JpaRepository<User,Long>{
     
     @Query("SELECT u FROM User u Where u.approved=false")
     List<User> findApprovalRequest();
+
+    
 }

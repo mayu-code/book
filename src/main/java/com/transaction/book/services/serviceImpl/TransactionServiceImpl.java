@@ -1,5 +1,7 @@
 package com.transaction.book.services.serviceImpl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,5 +30,14 @@ public class TransactionServiceImpl implements TransactionService{
     public Transaction getTransactionById(long id) {
         return this.transactionRepo.findById(id).get();
     }
-    
+
+    @Override
+    public List<Transaction> getTrasactionsByCustomerId(long id) {
+        return this.transactionRepo.findByCustomerId(id);
+    }
+
+    @Override
+    public List<Transaction> getAfterTransactions(long customerId, String date) {
+        return this.transactionRepo.findAfterTransactions(customerId, date);   
+    }
 }

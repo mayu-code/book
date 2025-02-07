@@ -32,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> getAllCustomers() {
-        return this.customerRepo.findAll();
+        return this.customerRepo.findAllCustomers();
     }
 
     @Override

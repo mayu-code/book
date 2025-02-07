@@ -1,5 +1,6 @@
 package com.transaction.book.controller;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.transaction.book.dto.requestDTO.NewTransactionRequest;
+import com.transaction.book.dto.responseObjects.DataResponse;
 import com.transaction.book.dto.responseObjects.SuccessResponse;
 import com.transaction.book.dto.updateDto.UpdateTransaction;
 import com.transaction.book.entities.Customer;
 import com.transaction.book.entities.Transaction;
+import com.transaction.book.helper.DateTimeFormat;
 import com.transaction.book.services.serviceImpl.CustomerServiceImpl;
 import com.transaction.book.services.serviceImpl.TransactionServiceImpl;
 
@@ -62,10 +66,16 @@ public class TransactionController {
                 customer.setAmount(customer.getAmount()+request.getAmount());
                 transaction.setAmount(request.getAmount());
             }
-            
-            customer= this.customerServiceImpl.addCustomer(customer);
+
+            for(Transaction transaction2:this.transactionServiceImpl.getAfterTransactions(customer.getId(), request.getDate())){
+                transaction2.setBalanceAmount(transaction2.getBalanceAmount()+request.getAmount());
+                this.transactionServiceImpl.addTransaction(transaction);
+            }
+
+            customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
             transaction.setBalanceAmount(customer.getAmount());
             transaction.setCustomer(customer);
+            customer= this.customerServiceImpl.addCustomer(customer);
             this.transactionServiceImpl.addTransaction(transaction);
 
             response.setMessage("Add Transaction Successfully !");
@@ -105,6 +115,7 @@ public class TransactionController {
                 transaction.setAmount(request.getAmount());
             }
             transaction.setBalanceAmount(customer.getAmount());
+            customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
             this.customerServiceImpl.addCustomer(customer);
             this.transactionServiceImpl.addTransaction(transaction);
             response.setMessage("transaction update successfully !");
@@ -127,7 +138,14 @@ public class TransactionController {
         Customer customer = transaction.getCustomer();
         try{
             customer.setAmount(customer.getAmount()-transaction.getAmount());
+            customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
             this.customerServiceImpl.addCustomer(customer);
+
+            for(Transaction transaction2:this.transactionServiceImpl.getAfterTransactions(customer.getId(), transaction.getDate())){
+                transaction2.setBalanceAmount(transaction2.getBalanceAmount()-transaction.getAmount());
+                this.transactionServiceImpl.addTransaction(transaction2);
+            }
+
             this.transactionServiceImpl.deleteTransaction(id);
 
             response.setMessage("transaction deleted successfully !");
@@ -136,6 +154,25 @@ public class TransactionController {
             return ResponseEntity.of(Optional.of(response));
         }
         catch(Exception e){
+            response.setMessage(e.getMessage());
+            response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode(500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/getCustomersTransaction/{customerId}")
+    public ResponseEntity<?> getCustomersTransaction(@PathVariable("customerId")long id){
+        
+        try{
+            DataResponse response = new DataResponse();
+            response.setMessage("get All trasactions successfully !");
+            response.setData(this.transactionServiceImpl.getTrasactionsByCustomerId(id));
+            response.setHttpStatus(HttpStatus.OK);
+            response.setStatusCode(200);
+            return ResponseEntity.of(Optional.of(response));
+        }catch(Exception e){
+            SuccessResponse response =new SuccessResponse();
             response.setMessage(e.getMessage());
             response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             response.setStatusCode(500);

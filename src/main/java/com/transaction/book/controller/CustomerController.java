@@ -1,5 +1,6 @@
 package com.transaction.book.controller;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import com.transaction.book.dto.responseObjects.DataResponse;
 import com.transaction.book.dto.responseObjects.SuccessResponse;
 import com.transaction.book.entities.Address;
 import com.transaction.book.entities.Customer;
+import com.transaction.book.helper.DateTimeFormat;
 import com.transaction.book.services.serviceImpl.AddressServiceImpl;
 import com.transaction.book.services.serviceImpl.CustomerServiceImpl;
 
@@ -42,7 +44,7 @@ public class CustomerController {
             customer.setName(request.getName());
             customer.setMobileNo(request.getMobileNo());
             customer.setGstinNo(request.getGstinNo());
-            customer.setUpdateDate("");
+            customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
             customer = this.customerServiceImpl.addCustomer(customer);
 
             address.setBuildingNO(request.getAddress().getBuildingNO());
