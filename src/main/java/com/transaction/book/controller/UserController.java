@@ -51,9 +51,18 @@ public class UserController {
     public ResponseEntity<?> getDashboard(){
         try{
             Dashboard dashboard = new Dashboard();
-            dashboard.setYouWillGate(this.customerServiceImpl.getTotalGetAmount());
-            dashboard.setYouWillGave(this.customerServiceImpl.getToalGaveAmount());
+            try{
+                dashboard.setYouWillGate(this.customerServiceImpl.getTotalGetAmount());
+            }catch(Exception e){
+                dashboard.setYouWillGate(0);
+            }
+            try{
+                dashboard.setYouWillGave(this.customerServiceImpl.getToalGaveAmount());
+            }catch(Exception e){
+                dashboard.setYouWillGave(0);
+            }
 
+            System.out.println(dashboard);
             DataResponse response = new DataResponse();
             response.setData(dashboard);
             response.setMessage("Dashboard get successfully !");

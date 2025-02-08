@@ -2,7 +2,6 @@ package com.transaction.book.services.logicService;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.engine.transaction.internal.TransactionImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
