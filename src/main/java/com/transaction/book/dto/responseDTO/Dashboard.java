@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class Dashboard {
     private double youWillGave;
-    private double youWillGate;
+    private double youWillGet;
 }
