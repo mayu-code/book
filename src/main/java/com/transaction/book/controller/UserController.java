@@ -52,9 +52,9 @@ public class UserController {
         try{
             Dashboard dashboard = new Dashboard();
             try{
-                dashboard.setYouWillGate(this.customerServiceImpl.getTotalGetAmount());
+                dashboard.setYouWillGet(this.customerServiceImpl.getTotalGetAmount());
             }catch(Exception e){
-                dashboard.setYouWillGate(0);
+                dashboard.setYouWillGet(0);
             }
             try{
                 dashboard.setYouWillGave(this.customerServiceImpl.getToalGaveAmount());
@@ -77,6 +77,7 @@ public class UserController {
             response.setStatusCode(500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+
     }
     
 }
