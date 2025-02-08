@@ -22,6 +22,7 @@ import com.transaction.book.dto.updateDto.UpdateTransaction;
 import com.transaction.book.entities.Customer;
 import com.transaction.book.entities.Transaction;
 import com.transaction.book.helper.DateTimeFormat;
+import com.transaction.book.services.logicService.TransactionMethods;
 import com.transaction.book.services.serviceImpl.CustomerServiceImpl;
 import com.transaction.book.services.serviceImpl.TransactionServiceImpl;
 
@@ -35,6 +36,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionServiceImpl transactionServiceImpl;
+
+    @Autowired
+    private TransactionMethods transactionMethods;
 
     @PostMapping("/addTransaction")
     public ResponseEntity<SuccessResponse> addTransaction(@RequestBody NewTransactionRequest request){
@@ -54,41 +58,17 @@ public class TransactionController {
         }
     
         try{
-            Transaction transaction = new Transaction();
-            transaction.setDate(request.getDate());
-            transaction.setDetail(request.getDetail());
-
-            if(request.isGave()){
-                customer.setAmount(customer.getAmount()+(request.getAmount()*(-1)));
-                transaction.setAmount(request.getAmount()*(-1));
-            }
-            else{
-                customer.setAmount(customer.getAmount()+request.getAmount());
-                transaction.setAmount(request.getAmount());
-            }
-
-            Transaction transaction3 = this.transactionServiceImpl.findPreviousTransaction(customer.getId(), request.getDate());
-            if(transaction3==null){
-                transaction.setBalanceAmount(transaction.getAmount());
+            if(this.transactionMethods.addNewTransaction(request)){
+                response.setMessage("Add Transaction Successfully !");
+                response.setHttpStatus(HttpStatus.OK);
+                response.setStatusCode(200);
+                return ResponseEntity.of(Optional.of(response));
             }else{
-                transaction.setBalanceAmount(transaction3.getBalanceAmount()+transaction.getAmount());
+                response.setMessage("something went wrong !");
+                response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                response.setStatusCode(500);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-
-            customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
-            transaction.setCustomer(customer);
-            customer= this.customerServiceImpl.addCustomer(customer);
-            transaction = this.transactionServiceImpl.addTransaction(transaction);
-            double balance = transaction.getBalanceAmount()+request.getAmount();
-            for(Transaction transaction2:this.transactionServiceImpl.getAfterTransactions(customer.getId(), request.getDate())){
-                transaction2.setBalanceAmount(balance);
-                transaction2= this.transactionServiceImpl.addTransaction(transaction2);
-                balance = transaction2.getBalanceAmount();
-            }
-
-            response.setMessage("Add Transaction Successfully !");
-            response.setHttpStatus(HttpStatus.OK);
-            response.setStatusCode(200);
-            return ResponseEntity.of(Optional.of(response));
         }catch(Exception e){
             response.setMessage(e.getMessage());
             response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -109,22 +89,8 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         try{
-            customer.setAmount(customer.getAmount()-transaction.getAmount());
-            transaction.setDate(request.getDate());
-            transaction.setDetail(request.getDetail());
-
-            if(request.isGave()){
-                customer.setAmount(customer.getAmount()+(request.getAmount()*(-1)));
-                transaction.setAmount(request.getAmount()*(-1));
-            }
-            else{
-                customer.setAmount(customer.getAmount()+request.getAmount());
-                transaction.setAmount(request.getAmount());
-            }
-            transaction.setBalanceAmount(customer.getAmount());
-            customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
-            this.customerServiceImpl.addCustomer(customer);
-            this.transactionServiceImpl.addTransaction(transaction);
+            this.transactionMethods.updateTransaction(customer.getId(), request);
+            
             response.setMessage("transaction update successfully !");
             response.setHttpStatus(HttpStatus.OK);
             response.setStatusCode(200);

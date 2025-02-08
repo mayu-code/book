@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.transaction.book.dto.responseDTO.CusotomerFullResponse;
+import com.transaction.book.dto.responseDTO.CustomerResponse;
 import com.transaction.book.entities.Customer;
 import com.transaction.book.repository.CustomerRepo;
 import com.transaction.book.services.serviceInterface.CustomerService;
@@ -49,6 +51,16 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public double getToalGaveAmount() {
         return this.customerRepo.getTotalGaveAmount();
+    }
+
+    @Override
+    public CusotomerFullResponse getCustomerResponseById(long id) {
+        return this.customerRepo.findCustomerResponseById(id);
+    }
+
+    @Override
+    public List<CustomerResponse> findAllCustomerResponse() {
+        return this.customerRepo.findAllCustomerResponse();
     }
 
 }

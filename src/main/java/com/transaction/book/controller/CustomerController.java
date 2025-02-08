@@ -47,7 +47,7 @@ public class CustomerController {
             customer.setUpdateDate(DateTimeFormat.format(LocalDateTime.now()));
             customer = this.customerServiceImpl.addCustomer(customer);
 
-            address.setBuildingNO(request.getAddress().getBuildingNO());
+            address.setBuildingNO(request.getAddress().getBuildingNo());
             address.setArea(request.getAddress().getArea());
             address.setCity(request.getAddress().getCity());
             address.setPincode(request.getAddress().getPincode());
@@ -71,7 +71,7 @@ public class CustomerController {
     public ResponseEntity<DataResponse> getAllCustomer(){
         DataResponse response = new DataResponse();
         try{
-            response.setData(this.customerServiceImpl.getAllCustomers());
+            response.setData(this.customerServiceImpl.findAllCustomerResponse());
             response.setMessage("get all Customers !");
             response.setHttpStatus(HttpStatus.OK);
             response.setStatusCode(200);
@@ -94,6 +94,25 @@ public class CustomerController {
             response.setStatusCode(200);
             return ResponseEntity.of(Optional.of(response));
         }catch(Exception e){
+            response.setMessage(e.getMessage());
+            response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode(500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/getCustomer/{id}")
+    public ResponseEntity<?> getCustomerbyId(@PathVariable("id")long id){
+        
+        try{
+            DataResponse response = new DataResponse();
+            response.setData(this.customerServiceImpl.getCustomerResponseById(id));
+            response.setMessage("delete Customer successfully !");
+            response.setHttpStatus(HttpStatus.OK);
+            response.setStatusCode(200);
+            return ResponseEntity.of(Optional.of(response));
+        }catch(Exception e){
+            SuccessResponse response = new SuccessResponse();
             response.setMessage(e.getMessage());
             response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             response.setStatusCode(500);
