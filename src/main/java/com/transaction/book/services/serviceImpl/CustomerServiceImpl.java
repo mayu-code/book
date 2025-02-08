@@ -59,8 +59,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerResponse> findAllCustomerResponse() {
-        return this.customerRepo.findAllCustomerResponse();
+    public List<CustomerResponse> findAllCustomerResponse(String query,boolean gave,boolean get,boolean settel) {
+        return this.customerRepo.findAllCustomerResponse(query,gave,get,settel);
     }
 
 }

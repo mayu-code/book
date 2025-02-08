@@ -25,6 +25,7 @@ public class Customer {
     private double amount;
     private String dueDate;
     private String updateDate;
+    private String reference;
 
     @OneToMany(mappedBy = "customer",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Transaction> transactions;
