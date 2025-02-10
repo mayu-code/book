@@ -27,7 +27,7 @@ public interface CustomerRepo extends JpaRepository<Customer,Long>{
         SELECT new com.transaction.book.dto.responseDTO.CustomerResponse(c.id, c.name, c.mobileNo, c.gstinNo, c.amount, c.dueDate, c.updateDate) 
         FROM Customer c
         WHERE (:query IS NULL OR (c.name LIKE %:query% OR c.mobileNo LIKE %:query%))
-        AND (:gave = true AND c.amount > 0 OR :get = true AND c.amount < 0 OR :settel =true AND c.amount=0)
+        AND ((:gave = true OR c.amount > 0) OR (:get = true OR c.amount < 0) OR (:settel =true OR c.amount=0))
         ORDER BY c.updateDate DESC
     """)
     List<CustomerResponse> findAllCustomerResponse(@Param("query")String query,@Param("gave")boolean gave,@Param("get")boolean get,@Param("settel")boolean settel);
